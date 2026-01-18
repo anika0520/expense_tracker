@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Oikawa's Overdraft 🏐</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Oswald:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body data-bs-theme="dark">
+    <!-- default dark -->
+    <!-- Intro Video Overlay -->
+    <div
+      id="intro-overlay"
+      class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-black"
+      style="z-index: 9999; opacity: 1; transition: opacity 1.5s"
+    >
+      <video
+        id="intro-video"
+        autoplay
+        muted
+        playsinline
+        style="width: 100%; height: 100%; object-fit: cover"
+      >
+        <source src="intro-video.mp4" type="video/mp4" />
+        <!-- ← replace with your file or URL -->
+        Your browser does not support video.
+      </video>
+      <!-- Optional skip button (for impatient users) -->
+      <button
+        id="skip-intro"
+        class="btn btn-outline-light position-absolute bottom-0 end-0 m-4"
+      >
+        Skip
+      </button>
+    </div>
+    <div class="bg-overlay"></div>
+
+    <header class="hero text-center py-5">
+      <div class="container">
+        <img
+          src="https://wallpapers.com/images/hd/orange-karasuno-boys-haikyuu-desktop-deprn6fntp7mqz11.jpg"
+          alt="Karasuno"
+          class="hero-img mb-3"
+        />
+        <h1 class="display-3 fw-bold text-orange">Oikawa's Overdraft</h1>
+        <p class="lead text-light opacity-75">
+          Surviving Australia — one spike at a time
+        </p>
+        <div class="quote-box mt-4 p-3 rounded shadow">
+          <p id="haikyuu-quote" class="fst-italic mb-0"></p>
+        </div>
+        <button id="theme-toggle" class="btn btn-outline-orange mt-3">
+          <i class="fas fa-moon"></i> Toggle Theme
+        </button>
+        <select id="currency-select" class="form-select mt-2 w-auto mx-auto">
+          <option value="AUD">AUD</option>
+          <option value="USD">USD</option>
+          <option value="INR">INR</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="container py-5">
+      <!-- Budget Setup -->
+      <div class="card glass-card mb-4">
+        <div class="card-body">
+          <h5 class="text-orange">Monthly Budget</h5>
+          <div class="input-group mb-3">
+            <input
+              type="number"
+              id="monthly-budget"
+              class="form-control glass-input"
+              placeholder="Set monthly budget (e.g. 2000)"
+            />
+            <button id="set-budget" class="btn btn-orange">Set</button>
+          </div>
+          <div id="budget-status" class="mt-2"></div>
+        </div>
+      </div>
+
+      <!-- Controls: Filter, Search, View -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <input
+            type="text"
+            id="search-input"
+            class="form-control glass-input"
+            placeholder="Search notes..."
+          />
+        </div>
+        <div class="col-md-4">
+          <select id="category-filter" class="form-select glass-input">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <select id="time-view" class="form-select glass-input">
+            <option value="all">All Time</option>
+            <option value="day">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Total Card -->
+        <div class="col-lg-4">
+          <div class="card glass-card h-100 shadow-lg">
+            <div class="card-body text-center">
+              <h5 class="card-title text-orange fw-bold">
+                Total Spent (<span id="curr-symbol">$</span>)
+              </h5>
+              <h2 id="total-expense" class="display-4 fw-bold text-white">
+                $0.00
+              </h2>
+              <p class="funny-quote small">
+                Pro tip: That latte > Hinata's jump height
+              </p>
+              <button
+                class="btn btn-orange mt-3 px-5 py-3"
+                data-bs-toggle="modal"
+                data-bs-target="#addExpenseModal"
+              >
+                <i class="fas fa-plus me-2"></i>Add Expense
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prediction -->
+        <div class="col-lg-4">
+          <div class="card glass-card h-100 shadow-lg">
+            <div class="card-body text-center">
+              <h5 class="card-title text-orange fw-bold">
+                Next Month Prediction
+              </h5>
+              <p id="prediction-result" class="fs-4 fw-bold text-white mt-4">
+                Add data for AI magic
+              </p>
+              <button id="predict-btn" class="btn btn-outline-orange mt-3">
+                <i class="fas fa-brain me-2"></i>Predict
+              </button>
+              <p class="funny-quote small mt-3">
+                "Meat pies will claim it anyway"
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Insights Card -->
+        <div class="col-lg-4">
+          <div class="card glass-card h-100 shadow-lg">
+            <div class="card-body">
+              <h5 class="text-orange">Smart Insights</h5>
+              <p id="insights" class="small"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="row g-4 mt-4">
+        <div class="col-lg-7">
+          <div class="card glass-card shadow-lg">
+            <div class="card-header bg-transparent border-0">
+              <h5 class="mb-0 text-orange fw-bold">Spending Breakdown</h5>
+            </div>
+            <div class="card-body">
+              <canvas id="expense-chart" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="card glass-card shadow-lg">
+            <div class="card-header bg-transparent border-0">
+              <h5 class="mb-0 text-orange fw-bold">Recent Expenses</h5>
+            </div>
+            <ul
+              id="expense-list"
+              class="list-group list-group-flush bg-transparent"
+            ></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Moochi -->
+      <div class="text-center mt-5 py-4">
+        <img
+          src="https://cdn11.bigcommerce.com/s-89ffd/images/stencil/728x728/products/172896/743271/sk-japan-sk-japan-mochi-mochi-mascot-vol.5-haikyuu-9pcs-box__19654.1745023218.jpg?c=2"
+          alt="Moochi"
+          class="img-fluid rounded shadow"
+          style="max-height: 180px; opacity: 0.95"
+        />
+        <p class="funny-quote small mt-2">
+          (Save cash – Moochi needs snacks! 🏐)
+        </p>
+      </div>
+    </main>
+
+    <!-- Add Expense Modal -->
+    <div class="modal fade" id="addExpenseModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-modal">
+          <div class="modal-header border-0">
+            <h5 class="modal-title text-orange fw-bold">New Expense</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="expense-form">
+              <div class="mb-3">
+                <label class="form-label text-light">Notes/Description</label>
+                <input
+                  type="text"
+                  class="form-control glass-input"
+                  id="description"
+                  required
+                  placeholder="e.g. Overpriced flat white"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-light">Amount</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  class="form-control glass-input"
+                  id="amount"
+                  required
+                  placeholder="12.50"
+                />
+              </div>
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <label class="form-label text-light">Date</label>
+                  <input
+                    type="date"
+                    class="form-control glass-input"
+                    id="date"
+                    required
+                  />
+                </div>
+                <div class="col-6 mb-3">
+                  <label class="form-label text-light">Category</label>
+                  <select
+                    class="form-select glass-input"
+                    id="category"
+                  ></select>
+                  <input
+                    type="text"
+                    id="new-category"
+                    class="form-control glass-input mt-2"
+                    placeholder="Add new category"
+                  />
+                  <button
+                    type="button"
+                    id="add-category-btn"
+                    class="btn btn-sm btn-outline-orange mt-1"
+                  >
+                    Add Category
+                  </button>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-light">Payment Method</label>
+                <select class="form-select glass-input" id="payment-method">
+                  <option>Cash</option>
+                  <option>Card</option>
+                  <option>UPI</option>
+                  <option>Bank Transfer</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="form-check mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="recurring"
+                />
+                <label class="form-check-label text-light" for="recurring"
+                  >Recurring (monthly)</label
+                >
+              </div>
+              <button type="submit" class="btn btn-orange w-100 py-3 fw-bold">
+                Save
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer
+      class="bg-dark text-center text-lg-start text-white py-4 mt-5 border-top border-orange"
+    >
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6 text-center text-lg-start mb-3 mb-lg-0">
+            <p class="mb-0 small text-nowrap">
+              Made with 🏐 by ANIKA for Saanidhya’s “adventure” (aka voluntary
+              bankruptcy)
+            </p>
+          </div>
+          <div class="col-lg-6 text-center text-lg-end">
+            <a
+              href="https://www.linkedin.com/in/anika-gangwar-3a10772b1/"
+              target="_blank"
+              class="me-4 text-white fs-4"
+              title="LinkedIn"
+            >
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a
+              href="https://github.com/anika0520"
+              target="_blank"
+              class="text-white fs-4"
+              title="GitHub"
+            >
+              <i class="fab fa-github"></i>
+            </a>
+          </div>
+        </div>
+        <div class="text-center mt-3 small opacity-75">
+          © 2026 ANIKA – Keep spiking those expenses and soon you’ll be the
+          little giant… of brokeness!
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/brain.js/2.0.0-beta/brain-browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
